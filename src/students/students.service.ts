@@ -2,14 +2,10 @@ import { Injectable } from "@nestjs/common";
 import { StudentsRepository } from "./students.repository";
 import { FailToCreateError } from "./errors/FailToCreate.error";
 import { EStudentsErrors } from "./errors/types/studentsErrors";
-import { NotFoundError } from "./errors/NotFound.error";
 
 @Injectable()
 export class StudentsService {
   constructor(private studentsRepository: StudentsRepository) {}
-  public hello(): string {
-    return "Hello, World!";
-  }
 
   public async findMany() {
     const data = await this.studentsRepository.findMany();
@@ -56,5 +52,17 @@ export class StudentsService {
     await this.studentsRepository.delete(id);
 
     return student.id;
+  }
+
+  public async update(id: string, data: any) {
+    const student = await this.studentsRepository.findOne(id);
+
+    if (Object.keys(student).length === 0) {
+      return {};
+    }
+
+    await this.studentsRepository.update(id, data);
+
+    return id;
   }
 }

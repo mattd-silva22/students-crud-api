@@ -40,7 +40,7 @@ export class StudentsRepository {
     }
   }
 
-  async create(data: TStudent): Promise<string> {
+  public async create(data: TStudent): Promise<string> {
     try {
       const { name, cpf, email } = data;
       const query =
@@ -53,10 +53,20 @@ export class StudentsRepository {
     }
   }
 
-  async delete(id: string) {
+  public async delete(id: string) {
     try {
       return await this.db.query("DELETE FROM students WHERE id = $1", [id]);
     } catch (error) {
+      throw new DatabaseFail(error.name, error.message, error.details);
+    }
+  }
+
+  public async update(id: string, data: any) {
+    try {
+      const query = "UPDATE students SET name = $1, email = $2 WHERE id = $3";
+      return await this.db.query(query, [data.name, data.email, id]);
+    } catch (error) {
+      console.log(error);
       throw new DatabaseFail(error.name, error.message, error.details);
     }
   }

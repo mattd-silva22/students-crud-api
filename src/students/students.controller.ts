@@ -4,8 +4,7 @@ import { EErrors } from "src/shared/errors/types/Errors.type";
 import { HttpResponse } from "src/shared/http/HttpResponse";
 import { StudentsService } from "./students.service";
 import { cpfValidator } from "src/utils/cpfValidator.util";
-import { Controller, Delete, Get, Patch, Post, Req, Res } from "@nestjs/common";
-import { EStudentsErrors } from "./errors/types/studentsErrors";
+import { Controller, Delete, Get, Post, Put, Req, Res } from "@nestjs/common";
 import { emailValidator } from "src/utils/emailValidator.util";
 import { uuidValidator } from "src/utils/uuidValidator.utils";
 
@@ -95,8 +94,49 @@ export class StudentsController {
     }
   }
 
-  @Patch("/:id")
-  public update(@Req() req: Request, @Res() res: Response) {}
+  @Put("/")
+  public async update(@Req() req: Request, @Res() res: Response) {
+    const { id, name, email } = req.body;
+    const errors = [];
+
+    if (!id) {
+      errors.push("ID is required");
+    }
+
+    if (uuidValidator(id) === false) {
+      errors.push("Invalid ID");
+    }
+
+    if (!name) {
+      errors.push("Name is required");
+    }
+
+    if (!email) {
+      errors.push("Email is required");
+    }
+
+    if (emailValidator(email) === false) {
+      errors.push("Invalid email");
+    }
+
+    if (errors.length) {
+      const response = new HttpResponse(EErrors.BAD_REQUEST, null, errors);
+      return res.status(StatusCodes.BAD_REQUEST).json(response.error());
+    }
+
+    const data = {
+      name: name,
+      email: email,
+    };
+
+    try {
+      await this.studentsService.update(id, data);
+      return res.status(StatusCodes.ACCEPTED).json({});
+    } catch (err) {
+      const response = new HttpResponse(err.name, null, err.message);
+      return res.status(err.statusCode).json(response.error());
+    }
+  }
 
   @Delete("/:id")
   public async delete(@Req() req: Request, @Res() res: Response) {
