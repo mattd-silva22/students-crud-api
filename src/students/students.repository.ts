@@ -1,26 +1,50 @@
 import { Injectable } from "@nestjs/common";
 import { PostgresConnector } from "src/shared/database/postgres/postgressConnector.db";
+import { TStudent } from "./types/student.type";
+import { EStudentsErrors } from "./errors/types/studentsErrors";
+import { FailToCreateError } from "./errors/FailToCreate.error";
+import { DatabaseFail } from "src/shared/database/DatabaseFail.error";
 
 @Injectable()
 export class StudentsRepository {
-  private students: any[];
+  public students: any[];
   constructor(private db: PostgresConnector) {
     const students = [];
   }
 
-  async findMany(): Promise<any[]> {
+  public async findMany(): Promise<any[]> {
     return await this.db.query("SELECT * FROM students");
   }
 
-  findOne(id: string) {
-    console.log("aqui 22");
+  public findOne(id: string) {
     const result = this.students.find((student) => student.id === id);
-    console.log(result);
     return result;
   }
 
-  create(student: any) {
-    this.students.push(student);
+  public async findOneByCPF(cpf: string) {
+    try {
+      const query = "SELECT * FROM students WHERE cpf = $1";
+      const result = await this.db.query(query, [cpf]);
+      if (result.length === 0) {
+        return [];
+      }
+      return result;
+    } catch (error) {
+      throw new DatabaseFail(error.name, error.message, error.details);
+    }
+  }
+
+  async create(data: TStudent): Promise<string> {
+    try {
+      const { name, cpf, email } = data;
+      const query =
+        "INSERT INTO students (name, cpf, email) VALUES ($1, $2, $3) RETURNING id;";
+      const result = await this.db.query(query, [name, cpf, email]);
+      console.log(result);
+      return result[0].id;
+    } catch (err) {
+      throw new DatabaseFail(err.message, err.details, err.name);
+    }
   }
 
   delete(id: string) {

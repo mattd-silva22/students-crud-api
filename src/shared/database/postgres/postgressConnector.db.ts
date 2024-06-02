@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { Pool } from "pg";
+import { DatabaseError, Pool } from "pg";
 
 @Injectable()
 export class PostgresConnector {
@@ -21,7 +21,7 @@ export class PostgresConnector {
       const res = await client.query(text, params);
       return res.rows;
     } catch (err) {
-      console.error("Erro na execução da query", err.stack);
+      console.log(err);
       throw err;
     } finally {
       client.release();

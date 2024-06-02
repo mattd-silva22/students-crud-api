@@ -1,7 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { StudentsRepository } from "./students.repository";
-import { v4 as uuidv4 } from "uuid";
 import { TStudent } from "./types/student.type";
+import { FailToCreateError } from "./errors/FailToCreate.error";
+import { EStudentsErrors } from "./errors/types/studentsErrors";
 
 @Injectable()
 export class StudentsService {
@@ -19,19 +20,27 @@ export class StudentsService {
     };
   }
 
-  public create(name: string, cpf: string, email: string): string {
-    const student = {
-      id: uuidv4(),
-      name,
-      cpf,
-      email,
-    } as TStudent;
-    this.studentsRepository.create(student);
-    return student.id;
+  public async create(
+    name: string,
+    cpf: string,
+    email: string,
+  ): Promise<string> {
+    const student = await this.studentsRepository.findOneByCPF(cpf);
+    console.log(student);
+    if (student.length > 0) {
+      throw new FailToCreateError(EStudentsErrors.STUDENT_EXISTS);
+    }
+
+    const data = {
+      name: name,
+      cpf: cpf,
+      email: email,
+    };
+    const id = await this.studentsRepository.create(data);
+    return id;
   }
 
   public findOne(id: string) {
-    console.log("aqui");
     return this.studentsRepository.findOne(id);
   }
 

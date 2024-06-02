@@ -5,7 +5,8 @@ import { HttpResponse } from "src/shared/http/HttpResponse";
 import { StudentsService } from "./students.service";
 import { cpfValidator } from "src/utils/cpfValidator.util";
 import { Controller, Delete, Get, Patch, Post, Req, Res } from "@nestjs/common";
-import { EStudentsErrors } from "./errors/studentsErrors";
+import { EStudentsErrors } from "./errors/types/studentsErrors";
+import { emailValidator } from "src/utils/emailValidator.util";
 
 @Controller("/students")
 export class StudentsController {
@@ -44,10 +45,9 @@ export class StudentsController {
   }
 
   @Post("/")
-  public create(@Req() req: Request, @Res() res: Response) {
+  public async create(@Req() req: Request, @Res() res: Response) {
     const { name, cpf, email } = req.body;
     const errors = [];
-    console.log(req.body);
     if (!name) {
       errors.push("Name is required");
     }
@@ -64,7 +64,7 @@ export class StudentsController {
       errors.push("Invalid CPF");
     }
 
-    if (email && !email.includes("@")) {
+    if (emailValidator(email) === false) {
       errors.push("Invalid email");
     }
 
@@ -72,14 +72,18 @@ export class StudentsController {
       const response = new HttpResponse(EErrors.BAD_REQUEST, null, errors);
       return res.status(StatusCodes.BAD_REQUEST).json(response.error());
     }
-
-    const userId = this.studentsService.create(name, cpf, email);
-    const response = new HttpResponse(null, [
-      {
-        id: userId,
-      },
-    ]);
-    return res.status(StatusCodes.CREATED).json(response.success());
+    try {
+      const id = await this.studentsService.create(name, cpf, email);
+      const response = new HttpResponse(null, [
+        {
+          id: id,
+        },
+      ]);
+      return res.status(StatusCodes.CREATED).json(response.success());
+    } catch (err) {
+      const response = new HttpResponse(EErrors.BAD_REQUEST, null, err.message);
+      return res.status(err.statusCode).json(response.error());
+    }
   }
 
   @Patch("/:id")
@@ -99,7 +103,7 @@ export class StudentsController {
 
     if (!data) {
       const response = new HttpResponse(EStudentsErrors.NOT_FOUND, null);
-      return res.status(StatusCodes.NOT_FOUND).json(response.error());
+      return res.status(StatusCodes.CONFLICT).json(response.error());
     }
 
     const response = new HttpResponse(null, id);
