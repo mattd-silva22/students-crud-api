@@ -21,7 +21,6 @@ export class PostgresConnector {
       const res = await client.query(text, params);
       return res.rows;
     } catch (err) {
-      console.log(err);
       throw err;
     } finally {
       client.release();

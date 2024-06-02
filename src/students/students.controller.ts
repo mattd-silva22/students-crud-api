@@ -7,32 +7,42 @@ import { cpfValidator } from "src/utils/cpfValidator.util";
 import { Controller, Delete, Get, Patch, Post, Req, Res } from "@nestjs/common";
 import { EStudentsErrors } from "./errors/types/studentsErrors";
 import { emailValidator } from "src/utils/emailValidator.util";
+import { uuidValidator } from "src/utils/uuidValidator.utils";
 
 @Controller("/students")
 export class StudentsController {
   constructor(private studentsService: StudentsService) {}
 
   @Get("/:id")
-  public findOne(@Req() req: Request, @Res() res: Response) {
+  public async findOne(@Req() req: Request, @Res() res: Response) {
     const { id } = req.params;
-    console.log(id);
-
+    const errors = [];
     if (!id) {
-      const response = new HttpResponse(EErrors.BAD_REQUEST, null, [
-        "ID is required",
-      ]);
+      errors.push("ID is required");
+    }
+
+    if (uuidValidator(id) === false) {
+      errors.push("Invalid ID");
+    }
+
+    if (errors.length) {
+      const response = new HttpResponse(EErrors.BAD_REQUEST, null, errors);
       return res.status(StatusCodes.BAD_REQUEST).json(response.error());
     }
 
-    const data = this.studentsService.findOne(id);
+    try {
+      const data = await this.studentsService.findOne(id);
 
-    if (!data) {
-      const response = new HttpResponse(EStudentsErrors.NOT_FOUND, null);
-      return res.status(StatusCodes.NOT_FOUND).json(response.error());
+      if (Object.keys(data).length === 0) {
+        return res.status(StatusCodes.NOT_FOUND).json({});
+      }
+
+      const response = new HttpResponse(null, data);
+      return res.status(StatusCodes.OK).json(response.success());
+    } catch (err) {
+      const response = new HttpResponse(err.name, null, err.message);
+      return res.status(err.statusCode).json(response.error());
     }
-
-    const response = new HttpResponse(null, data);
-    return res.status(StatusCodes.OK).json(response.success());
   }
 
   @Get("/")

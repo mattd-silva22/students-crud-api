@@ -16,9 +16,17 @@ export class StudentsRepository {
     return await this.db.query("SELECT * FROM students");
   }
 
-  public findOne(id: string) {
-    const result = this.students.find((student) => student.id === id);
-    return result;
+  public async findOne(id: string) {
+    try {
+      const query = "SELECT * FROM students WHERE id = $1";
+      const result = await this.db.query(query, [id]);
+      if (result.length === 0) {
+        return {};
+      }
+      return result[0];
+    } catch (error) {
+      throw new DatabaseFail(error.name, error.message, error.details);
+    }
   }
 
   public async findOneByCPF(cpf: string) {
@@ -26,9 +34,9 @@ export class StudentsRepository {
       const query = "SELECT * FROM students WHERE cpf = $1";
       const result = await this.db.query(query, [cpf]);
       if (result.length === 0) {
-        return [];
+        return {};
       }
-      return result;
+      return result[0];
     } catch (error) {
       throw new DatabaseFail(error.name, error.message, error.details);
     }

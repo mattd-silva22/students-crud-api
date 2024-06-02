@@ -1,6 +1,5 @@
 import { Injectable } from "@nestjs/common";
 import { StudentsRepository } from "./students.repository";
-import { TStudent } from "./types/student.type";
 import { FailToCreateError } from "./errors/FailToCreate.error";
 import { EStudentsErrors } from "./errors/types/studentsErrors";
 
@@ -26,8 +25,8 @@ export class StudentsService {
     email: string,
   ): Promise<string> {
     const student = await this.studentsRepository.findOneByCPF(cpf);
-    console.log(student);
-    if (student.length > 0) {
+
+    if (Object.keys(student).length === 0) {
       throw new FailToCreateError(EStudentsErrors.STUDENT_EXISTS);
     }
 
@@ -40,8 +39,10 @@ export class StudentsService {
     return id;
   }
 
-  public findOne(id: string) {
-    return this.studentsRepository.findOne(id);
+  public async findOne(id: string) {
+    const data = await this.studentsRepository.findOne(id);
+
+    return data;
   }
 
   public delete(id: string) {
