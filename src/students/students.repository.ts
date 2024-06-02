@@ -1,8 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { PostgresConnector } from "src/shared/database/postgres/postgressConnector.db";
 import { TStudent } from "./types/student.type";
-import { EStudentsErrors } from "./errors/types/studentsErrors";
-import { FailToCreateError } from "./errors/FailToCreate.error";
 import { DatabaseFail } from "src/shared/database/DatabaseFail.error";
 
 @Injectable()
@@ -55,9 +53,11 @@ export class StudentsRepository {
     }
   }
 
-  delete(id: string) {
-    const index = this.students.findIndex((student) => student.id === id);
-    this.students.splice(index, 1);
-    return true;
+  async delete(id: string) {
+    try {
+      return await this.db.query("DELETE FROM students WHERE id = $1", [id]);
+    } catch (error) {
+      throw new DatabaseFail(error.name, error.message, error.details);
+    }
   }
 }

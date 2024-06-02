@@ -100,23 +100,33 @@ export class StudentsController {
   public update(@Req() req: Request, @Res() res: Response) {}
 
   @Delete("/:id")
-  public delete(@Req() req: Request, @Res() res: Response) {
+  public async delete(@Req() req: Request, @Res() res: Response) {
     const { id } = req.params;
+    const errors = [];
     if (!id) {
-      const response = new HttpResponse(EErrors.BAD_REQUEST, null, [
-        "ID is required",
-      ]);
+      errors.push("ID is required");
+    }
+
+    if (uuidValidator(id) === false) {
+      errors.push("Invalid ID");
+    }
+
+    if (errors.length) {
+      const response = new HttpResponse(EErrors.BAD_REQUEST, null, errors);
       return res.status(StatusCodes.BAD_REQUEST).json(response.error());
     }
 
-    const data = this.studentsService.delete(id);
+    try {
+      const data = await this.studentsService.delete(id);
 
-    if (!data) {
-      const response = new HttpResponse(EStudentsErrors.NOT_FOUND, null);
-      return res.status(StatusCodes.CONFLICT).json(response.error());
+      if (Object.keys(data).length === 0) {
+        return res.status(StatusCodes.NOT_FOUND).json({});
+      }
+
+      return res.status(StatusCodes.ACCEPTED).json({});
+    } catch (err) {
+      const response = new HttpResponse(err.name, null, err.message);
+      return res.status(err.statusCode).json(response.error());
     }
-
-    const response = new HttpResponse(null, id);
-    return res.status(StatusCodes.OK).json(response.success());
   }
 }
