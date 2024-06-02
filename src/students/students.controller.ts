@@ -47,7 +47,6 @@ export class StudentsController {
 
   @Get("/")
   public async findMany(@Req() req: Request, @Res() res: Response) {
-    const { name, cpf, email, id } = req.query;
     this.studentsService.findMany().then((data) => {
       const response = new HttpResponse(null, data);
       res.status(StatusCodes.OK).json(response.success());
