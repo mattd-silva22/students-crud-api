@@ -17,7 +17,7 @@ services:
     container_name: students-api
     build: .
     ports:
-      - "5000:3000"
+      - "5000:5000"
     depends_on:
       - postgres
     environment:

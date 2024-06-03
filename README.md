@@ -26,10 +26,13 @@ Siga os passos abaixo para executar a aplicação.
 
 No ambiente de homologação vamos utilizar o Docker Compose para rodar os container do banco de dados e API-Rest.
 
-Dentro da pasta raiz do repositório execute o seguinte comando Docker:
+Dentro da pasta raiz do repositório execute os seguintes comandos Docker:
+
+docker-compose build --no-cache
 
 ```bash
-	docker-compose up -d
+	docker-compose build --no-cache
+  docker-compose up -d
 ```
 
 O serviço ira ficar disponibilizado na localhost:5000.
