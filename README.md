@@ -45,7 +45,7 @@ Dentro da pasta raiz do repositório execute o seguinte comando Docker para gera
 ```bash
   cd ./sql
   docker build -t student-db-dev .
-  docker run -d --name my-student-db-dev student-db-dev
+  docker run -d -p 5432:5432 --name my-student-db-dev student-db-dev
 
 ```
 
