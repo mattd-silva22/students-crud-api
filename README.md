@@ -28,11 +28,12 @@ No ambiente de homologação vamos utilizar o Docker Compose para rodar os conta
 
 Dentro da pasta raiz do repositório execute os seguintes comandos Docker:
 
-docker-compose build --no-cache
-
 ```bash
-	docker-compose build --no-cache
-  docker-compose up -d
+
+  docker-compose build --no-cache
+
+  docker-compose up -d
+
 ```
 
 O serviço ira ficar disponibilizado na localhost:5000.
@@ -42,19 +43,70 @@ O serviço ira ficar disponibilizado na localhost:5000.
 Dentro da pasta raiz do repositório execute o seguinte comando Docker para gerar o banco de dados PostgreSQL com todas as configurações(usuários ,tabelas e etc):
 
 ```bash
+
 docker run --name student_db_dev -e POSTGRES_USER=postgres -e POSTGRES_DB=students_db -e POSTGRES_PASSWORD=root -v sql\init.sql -d postgres
+
 ```
 
 Agora execute os seguintes comando para instalar as dependências e iniciar o servidor de teste:
 
 ```bash
+
 npm install
+
 npm run start:dev
+
 ```
 
-O serviço ira ficar disponibilizado na localhost:3000.
+O serviço ira ficar disponibilizado na localhost:5000.
 
 ### Documentação:
+
+Todos os endpoints estão disponíveis para consulta dentro do [Swegger](localhost:5000/api) da aplicação
+
+#### Coletar Alunos
+
+Retorno todos os alunos encontrados.
+
+##### Request
+
+Método: GET
+Endpoint: /students
+
+##### Response
+
+Code : 200 - Retorna lista de alunos.
+Code : 4xx - Bad Request.
+Code : 5xx - Falha no servidor.
+
+**Corpo**
+
+```json
+{
+  "message": "success",
+  "data": {
+    "length": 2,
+    "students": [
+      {
+        "id": "14831b42-2225-46ca-bd42-b36dbe3934d0",
+        "name": "Beatriz Sara Isabel Martins",
+        "cpf": "48263924944",
+        "email": "beatriz.sara.martins@deskprint.com.br",
+        "created_at": "2024-06-03T16:03:53.014Z",
+        "updated_at": "2024-06-03T16:03:53.014Z"
+      },
+      {
+        "id": "4af1a92f-4bb6-4dfe-899d-cb69973bab38",
+        "name": "Severino Erick Melo",
+        "cpf": "78696479343",
+        "email": "severinoerickmelo@agenciaph.com",
+        "created_at": "2024-06-03T16:03:53.014Z",
+        "updated_at": "2024-06-03T16:03:53.014Z"
+      }
+    ]
+  }
+}
+```
 
 #### Criar Aluno:
 
@@ -62,33 +114,102 @@ Adicionar um novo aluno ao sistema.
 
 ##### Request
 
-Metodo: GET
+Método: POST
 Endpoint: /students
 
-Body{
-name : (string), obrigatório
-cpf : (string), obrigatório, somente números
-email : (string), obrigatório
+**Corpo**
+
+```json
+{
+  "name": "fulano de tal",
+  "cpf": "12345678910",
+  "email": "fulano.tal@email.net"
 }
+```
 
 ##### Response
 
-HTTP: 201
+Retorna o ID do aluno recém criado.
+
+**Corpo**
+
+```json
 {
-"message": "Success",
-"data": [
-{
-"id": "41d7df63-d566-40dc-a36b-1b565ff7f0cf"
+  "message": "success",
+  "data": {
+    "id": "53916e2e-b93b-4a20-bf58-7a2efb2867b2"
+  }
 }
-]
-}
+```
 
 #### Editar Aluno
 
-Editar um aluno dentro do sistema.
+Atualiza o cadastro de um aluno dentro do sitema
+
+##### Request
+
 Método: PUT
 Endpoint: /students
 
-Body{
+**Corpo**
 
+```json
+{
+  "id": "53916e2e-b93b-4a20-bf58-7a2efb2867b2",
+  "name": "fulano de tal",
+  "email": "fulano.tal@email.net"
 }
+```
+
+##### Response
+
+Code : 202 - Usuário criado com sucesso.
+Code : 409 - CPF já encontrado dentro do sistema.
+Code : 4xx - Bad Request.
+Code : 5xx - Falha no servidor.
+
+#### Buscar Aluno
+
+encontra aluno por ID
+
+##### Request
+
+Método: GET
+Endpoint: /students/:id
+
+##### Response
+
+Code : 200 - Retorna aluno.
+Code : 4xx - Bad Request.
+Code : 5xx - Falha no servidor.
+
+**Corpo**
+
+```json
+{
+  "message": "success",
+  "data": {
+    "id": "14831b42-2225-46ca-bd42-b36dbe3934d0",
+    "name": "Beatriz Sara Isabel Martins",
+    "cpf": "48263924944",
+    "email": "beatriz.sara.martins@deskprint.com.br",
+    "created_at": "2024-06-03T16:03:53.014Z",
+    "updated_at": "2024-06-03T16:03:53.014Z"
+  }
+}
+```
+
+#### Deletar Aluno
+
+encontra aluno por ID
+
+##### Request
+
+Método: DELETE
+Endpoint: /students/:id
+
+##### Response
+
+Code : 202 - Retorna deletado com sucesso.
+Code : 4xx - Bad Request.
+Code : 5xx - Falha no servidor.
