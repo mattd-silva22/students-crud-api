@@ -43,8 +43,9 @@ O serviço ira ficar disponibilizado na localhost:5000.
 Dentro da pasta raiz do repositório execute o seguinte comando Docker para gerar o banco de dados PostgreSQL com todas as configurações(usuários ,tabelas e etc):
 
 ```bash
-
-docker run --name student_db_dev -e POSTGRES_USER=postgres -e POSTGRES_DB=students_db -e POSTGRES_PASSWORD=root -v sql\init.sql -d postgres
+  cd ./sql
+  docker build -t student-db-dev .
+  docker run -d --name my-student-db-dev student-db-dev
 
 ```
 
@@ -78,7 +79,7 @@ Endpoint: /students
 É possivel filtrar o resultado atraves de query params.
 
 - name;
-- cpf;
+- Cpf;
 - email;
 
 ##### Response

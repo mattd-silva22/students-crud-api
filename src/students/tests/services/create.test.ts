@@ -1,5 +1,4 @@
 import { it, describe, expect, jest } from "@jest/globals";
-import { find } from "rxjs";
 import { FailToCreateError } from "src/students/errors/FailToCreate.error";
 import { StudentsRepository } from "src/students/students.repository";
 import { StudentsService } from "src/students/students.service";
