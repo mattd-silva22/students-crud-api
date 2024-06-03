@@ -23,7 +23,7 @@ export class StudentsService {
   ): Promise<string> {
     const student = await this.studentsRepository.findOneByCPF(cpf);
 
-    if (Object.keys(student).length < 0) {
+    if (Object.keys(student).length) {
       throw new FailToCreateError(EStudentsErrors.STUDENT_EXISTS);
     }
 
