@@ -1,28 +1,19 @@
-export class HttpResponse<T> {
-  constructor(
-    readonly message: string | null = null,
-    readonly data: T | null = null,
-    readonly errors: string[] | null = null,
-  ) {
+export class HttpResponseSuccess<T> {
+  message: string;
+  data?: T;
+
+  constructor(message: string, data?: T) {
     this.message = message;
-    this.data = data;
-    this.errors = errors;
+    this.data = data ?? ([] as T);
   }
+}
 
-  success(): {
-    message: string;
-    data: T | null;
-  } {
-    return {
-      message: this.message ?? "Success",
-      data: this.data,
-    };
-  }
+export class HttpResponseError {
+  message: string;
+  errors: string[];
 
-  error() {
-    return {
-      message: this.message ?? "Error",
-      errors: this.errors,
-    };
+  constructor(message: string, errors: string[]) {
+    message = message;
+    errors = errors;
   }
 }

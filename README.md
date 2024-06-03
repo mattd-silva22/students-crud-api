@@ -1,73 +1,91 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# API DE GESTÃO DE ALUNOS
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+### Índice
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+- [Descrição](#descricao)
+- [Setup](#setup)
+- [Documentação](#documentacao)
 
-## Description
+### Descrição
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+API-Rest construída em Nest.js que permite a criação, atualização , edição e exclusão de cadastros
 
-## Installation
+#### Tecnologias utilizadas:
 
-```bash
-$ npm install
-```
+- Nest.Js
+- PostgresSQL
+- Typescript
+- Jest
+- Docker
 
-## Running the app
+### Setup:
+
+Siga os passos abaixo para executar a aplicação.
+
+#### Ambiente de homologação
+
+No ambiente de homologação vamos utilizar o Docker Compose para rodar os container do banco de dados e API-Rest.
+
+Dentro da pasta raiz do repositório execute o seguinte comando Docker:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+	docker-compose up -d
 ```
 
-## Test
+O serviço ira ficar disponibilizado na localhost:5000.
+
+#### Ambiente de desenvolvimento
+
+Dentro da pasta raiz do repositório execute o seguinte comando Docker para gerar o banco de dados PostgreSQL com todas as configurações(usuários ,tabelas e etc):
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+docker run --name student_db_dev -e POSTGRES_USER=postgres -e POSTGRES_DB=students_db -e POSTGRES_PASSWORD=root -v sql\init.sql -d postgres
 ```
 
-## Support
+Agora execute os seguintes comando para instalar as dependências e iniciar o servidor de teste:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+npm install
+npm run start:dev
+```
 
-## Stay in touch
+O serviço ira ficar disponibilizado na localhost:3000.
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### Documentação:
 
-## License
+#### Criar Aluno:
 
-Nest is [MIT licensed](LICENSE).
+Adicionar um novo aluno ao sistema.
+
+##### Request
+
+Metodo: GET
+Endpoint: /students
+
+Body{
+name : (string), obrigatório
+cpf : (string), obrigatório, somente números
+email : (string), obrigatório
+}
+
+##### Response
+
+HTTP: 201
+{
+"message": "Success",
+"data": [
+{
+"id": "41d7df63-d566-40dc-a36b-1b565ff7f0cf"
+}
+]
+}
+
+#### Editar Aluno
+
+Editar um aluno dentro do sistema.
+Método: PUT
+Endpoint: /students
+
+Body{
+
+}

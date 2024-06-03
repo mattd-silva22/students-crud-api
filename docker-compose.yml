@@ -1,0 +1,27 @@
+version: "3.8"
+name: students-backend-compose
+services:
+  postgres:
+    container_name: students-db-postgres
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: students_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro # Initialize the DB
+
+  app:
+    container_name: students-api
+    build: .
+    ports:
+      - "5000:3000"
+    depends_on:
+      - postgres
+    environment:
+      POSTGRESS_HOST: students-db-postgres
+      POSTGRESS_USER: students_api
+      POSTGRESS_PASSWORD: Er4_2df78a1
+      POSTGRESS_DB: students_db
