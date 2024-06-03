@@ -12,6 +12,7 @@ import {
 } from "src/shared/http/HttpResponse";
 import { ApiResponse, ApiTags } from "@nestjs/swagger";
 import { TStudent } from "./types/student.type";
+import { TQuery } from "./types/query";
 
 @ApiTags("Students")
 @Controller("/students")
@@ -70,9 +71,52 @@ export class StudentsController {
   })
   @Get("/")
   public async findMany(@Req() req: Request, @Res() res: Response) {
-    this.studentsService.findMany().then((data) => {
-      res.status(StatusCodes.OK).json(new HttpResponseSuccess("success", data));
+    const { name, cpf, email } = req.query;
+    const validQueryParams = [];
+    const errors = [];
+
+    if (name) {
+      validQueryParams.push("name");
+    }
+
+    if (cpf) {
+      validQueryParams.push("cpf");
+    }
+
+    if (email) {
+      validQueryParams.push("email");
+    }
+
+    validQueryParams.forEach((param, i) => {
+      if (param.length > 50) {
+        errors.push(`Param ${i}: too long`);
+      }
     });
+
+    if (errors.length) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json(new HttpResponseError(EErrors.BAD_REQUEST, errors));
+    }
+
+    const query = {
+      name: name ?? "",
+      cpf: cpf ?? "",
+      email: email ?? "",
+    };
+
+    this.studentsService
+      .findMany(query as TQuery)
+      .then((data) => {
+        res
+          .status(StatusCodes.OK)
+          .json(new HttpResponseSuccess("success", data));
+      })
+      .catch((err) => {
+        res
+          .status(err.statusCode)
+          .json(new HttpResponseError(err.name, [err.message]));
+      });
   }
 
   @ApiResponse({

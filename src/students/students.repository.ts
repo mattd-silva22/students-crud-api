@@ -6,12 +6,37 @@ import { DatabaseFail } from "src/shared/database/DatabaseFail.error";
 @Injectable()
 export class StudentsRepository {
   public students: any[];
-  constructor(private db: PostgresConnector) {
-    const students = [];
-  }
+  constructor(private db: PostgresConnector) {}
 
-  public async findMany(): Promise<any[]> {
-    return await this.db.query("SELECT * FROM students");
+  public async findMany(params: {
+    name: string;
+    cpf: string;
+    email: string;
+  }): Promise<any[]> {
+    try {
+      const { cpf, email, name } = params;
+      let query = "SELECT * FROM students WHERE true";
+
+      const values = [];
+
+      if (name) {
+        query += " AND UPPER(name) LIKE UPPER($1)";
+        values.push(`%${name}%`);
+      }
+
+      if (cpf) {
+        query += " AND cpf LIKE $2";
+        values.push(`${cpf}`);
+      }
+
+      if (email) {
+        query += " AND UPPER(email) LIKE UPPER($3)";
+        values.push(`%${email}%`);
+      }
+      return await this.db.query(query, values);
+    } catch (error) {
+      throw new DatabaseFail(error.name, error.message, error.details);
+    }
   }
 
   public async findOne(id: string) {

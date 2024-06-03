@@ -2,13 +2,14 @@ import { Injectable } from "@nestjs/common";
 import { StudentsRepository } from "./students.repository";
 import { FailToCreateError } from "./errors/FailToCreate.error";
 import { EStudentsErrors } from "./errors/types/studentsErrors";
+import { TQuery } from "./types/query";
 
 @Injectable()
 export class StudentsService {
   constructor(private studentsRepository: StudentsRepository) {}
 
-  public async findMany() {
-    const data = await this.studentsRepository.findMany();
+  public async findMany(params: TQuery) {
+    const data = await this.studentsRepository.findMany(params);
 
     return {
       length: data.length,

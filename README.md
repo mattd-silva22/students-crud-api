@@ -66,12 +66,20 @@ Todos os endpoints estão disponíveis para consulta dentro do [Swegger](localho
 
 #### Coletar Alunos
 
-Retorno todos os alunos encontrados.
+Retorno todos os alunos encontrados e realizar pesquisar com base no nome, email e cpf.
 
 ##### Request
 
 Método: GET
 Endpoint: /students
+
+#### Filtros:
+
+É possivel filtrar o resultado atraves de query params.
+
+- name;
+- cpf;
+- email;
 
 ##### Response
 
